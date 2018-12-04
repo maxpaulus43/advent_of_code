@@ -31,7 +31,7 @@ def get_free_square(file):
             for j in range(col, col + height):
                 board[(i, j)].add(id)
 
-    for _, id_hits in board.items():
+    for id_hits in board.values():
         if len(id_hits) > 1:
             valid_ids -= id_hits
 
