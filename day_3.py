@@ -21,7 +21,7 @@ def get_overlaps(file):
     return overlaps
 
 def get_free_square(file):
-    board = defaultdict(list)
+    board = defaultdict(set)
     valid_ids = set()
 
     for line in file:
@@ -29,12 +29,11 @@ def get_free_square(file):
         valid_ids.add(id)
         for i in range(row, row + width):
             for j in range(col, col + height):
-                board[(i, j)].append(id)
+                board[(i, j)].add(id)
 
     for _, id_hits in board.items():
         if len(id_hits) > 1:
-            for id in id_hits:
-                valid_ids.discard(id)
+            valid_ids -= id_hits
 
     return valid_ids.pop()
 
