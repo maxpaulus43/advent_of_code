@@ -42,7 +42,9 @@ def dumbest_guard(file):
     print(f"Strategy 1: { sleepiest_guard * sleepiest_minute }")
 
     # part 2
-    most_consistent_guard = max(minute_totals.items(), key=lambda kv : kv[1][max(kv[1], key=kv[1].get)])[0]
+    # this daunting line will find the guard with the minute that has the most 'hits'
+    most_consistent_guard = max(minute_totals.items(), key=lambda kv : kv[1][max(kv[1], key=kv[1].get)])[0] 
+    # this next piece of code will find the actual minute that had the most 'hits'
     most_consistent_time = max(minute_totals[most_consistent_guard], key=minute_totals[most_consistent_guard].get)
     print(f"Strategy 2: { most_consistent_guard * most_consistent_time }")
 
