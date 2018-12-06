@@ -1,50 +1,45 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class day_5 {
     public static void main(String[] args) {
+
         try {
             List<Character> polymer = Files.lines(Paths.get("input/day_5.txt"))
                     .flatMap(line -> line.chars().mapToObj(i -> (char) i))
-                    .collect(Collectors.toCollection(LinkedList::new));
+                    .collect(Collectors.toList());
 
-            System.out.println(part1(polymer));
-            System.out.println(part2(polymer));
+            System.out.println(combust(polymer));
+            System.out.println(findMinCombustion(polymer));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static int part1(List<Character> polymer) {
-        combust(new LinkedList<>(polymer));
-        return polymer.size();
-    }
+    private static int findMinCombustion(List<Character> polymer) {
+        Set<Character> chars = "abcdefghijklmnopqrstuvwxyz".chars().mapToObj(i -> (char) i).collect(Collectors.toSet());
 
-    private static int part2(List<Character> polymer) {
-        Set<Character> chars = "abcdefghijklmnopqrstuvwxyz".chars()
-            .mapToObj(i -> (char) i)
-            .collect(Collectors.toSet());
-
-        int minimumPolymerLen = polymer.size();
+        int minimumPolymerSize = polymer.size();
 
         for (char c : chars) {
-            List<Character> tmpPolymer = new LinkedList<>(polymer);
-            
-            tmpPolymer.removeIf(character -> Character.toLowerCase(character) == Character.toLowerCase(c));
-            
-            combust(tmpPolymer);
+            List<Character> tmpPolymer = polymer.stream()
+                    .filter(character -> Character.toLowerCase(character) != Character.toLowerCase(c))
+                    .collect(Collectors.toList());
 
-            if (tmpPolymer.size() < minimumPolymerLen) {
-                minimumPolymerLen = tmpPolymer.size();
+            int tmpSize = combust(tmpPolymer);
+
+            if (tmpSize < minimumPolymerSize) {
+                minimumPolymerSize = tmpSize;
             }
         }
 
-        return minimumPolymerLen;
+        return minimumPolymerSize;
     }
 
     private static boolean canReact(char a, char b) {
@@ -53,16 +48,17 @@ public class day_5 {
                         || (Character.isUpperCase(a) && Character.isLowerCase(b)));
     }
 
-    private static void combust(List<Character> polymer) {
-        int i = 1;
-        while (i < polymer.size()) {
-            if (canReact(polymer.get(i - 1), polymer.get(i))) {
-                polymer.remove(i);
-                polymer.remove(i - 1);
-                if (i > 1) i--;
+    private static int combust(List<Character> polymer) {
+        Stack<Character> polymerStack = new Stack<>();
+
+        for (Character c : polymer) {
+            if (!polymerStack.empty() && canReact(polymerStack.peek(), c)) {
+                polymerStack.pop();
             } else {
-                i++;
+                polymerStack.push(c);
             }
         }
+
+        return polymerStack.size();
     }
 }
